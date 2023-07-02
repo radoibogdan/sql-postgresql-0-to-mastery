@@ -564,5 +564,19 @@ WHERE column_name LIKE pattern;
 | % | The percent sign represents zero, one, or multiple characters |
 | _ | The underscore represents a single character |
 
+## CLI
 
+### Connect to CLI
+```
+$ psql -U postgres
+```
 
+### Restore database / Restore dump
+```
+$ psql -U postgres -d pgsql_dbname < script_import.sql
+```
+
+### Display users
+```
+$ \du
+```
