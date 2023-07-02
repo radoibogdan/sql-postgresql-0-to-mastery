@@ -41,11 +41,12 @@ select max(birth_date) from employees;
 #### Where clause
 ```sql
 select
-first_name ,last_name  
+    first_name,
+    last_name  
 from
-employees e
+    employees e
 where
-first_name = 'Mayumi' and last_name = 'Schueller';
+    first_name = 'Mayumi' and last_name = 'Schueller';
 ```
 
 #### NOT clause
@@ -55,11 +56,12 @@ where not age = 55 and not age = 20;
 ```
 
 #### NULL VALUES
-
-select 1 = 1 		 => true
-select 1 != 1 		 => false
-select null = null   => null
-select null <> null  => null
+| Operation           | Result  |
+|:--------------------|:--------|
+| select 1 = 1 	   | true    |
+| select 1 != 1 	   | false   |
+| select null = null  | null    |
+| select null <> null | null    |
 
 #### NULL + IS OPERATOR
 ```sql
@@ -79,30 +81,31 @@ where
 ```
 
 #### NULL + COALESCE FUNCTION
-similar to If else
+Similar to `If else`
 ```sql
 select coalesce (
     last_name,  -- if last_name IS NULL => first_name
     first_name,	-- if first_name IS NULL => default value "No Name"
     'No name'
 ) as name
-from employees;
+from 
+    employees;
 ```
 
-Assuming a students minimum age for the class is 15, what is the average age of a student?
-give defeault value of 15 if age is unknown
+Assuming a students minimum age for the class is 15, what is the average age of a student?  
+Give default value of 15 if age is unknown
 ```sql
 select avg(coalesce(age, 15)) from student;
 ```
 
-Replace all empty first or last names with a default?
+Replace all empty first or last names with a default
 ```sql
 select
     emp_no,
     coalesce(first_name, 'Inconnu') as FirstName,
     coalesce(last_name,'Inconnu') as LastName
-from
-employees;
+from 
+    employees;
 ```
 ####  BETWEEN X AND Y
 ```sql
@@ -116,36 +119,37 @@ where
 ####  SELECT IN
 ```sql
 select *
-from employees e
+from 
+    employees e
 where 
     emp_no in (10001, 10006, 11008);
 ```
 
-####  LIKE
-WILD CARDS
+####  LIKE and WILD CARDS
 - % => any number of characters
 - _ => 1 character (not optional)
 
 
 First name start with the letter M
-
 ```sql
 select *
-from employees e
-where last_name like '00%';
+from
+    employees e
+where
+    first_name  like 'M%';
 ```
 
 EXAMPLES
-- like '%2'  => Fields ends with 2
-- like '%2%' => Fields that have 2 anywhere in the value
-- like '_00%' => Fields that have 2 zero's as the second and third character + anything after ( Ex: 2000, but not 00)
-- like '2_%_%' => Fields that start with "2" + have 1 character + anything + have 1 chatacter + anything ( Ex: 233 or 2555577777, but not 22)
-- like '2___3' => Fields that have 5 characters, start with "2" end with "3"
+* `like '%2'`    => Fields ends with 2
+* `like '%2%'`   => Fields that have 2 anywhere in the value
+* `like '_00%'`  => Fields that have 2 zero's as the second and third character + anything after ( Ex: 2000, but not 00)
+* `like '2_%_%'` => Fields that start with "2" + have 1 character + anything + have 1 chatacter + anything ( Ex: 233 or 2555577777, but not 22)
+* `like '2___3'` => Fields that have 5 characters, start with "2" end with "3"
 
 ILIKE => case insensitive matching
 
 
-####  LIKE + CASTING
+####  LIKE and CASTING
 CASTING => In postgres you need to cast integers to use like
 
 ```sql
@@ -155,30 +159,28 @@ where salary::text like '6_1_6';
 ```
 
 ####  DATES
-UTC = Time Standard
-
+Set UTC = Time Standard
 ```sql
 show timezone;
 set TIME zone 'UTC';
 ```
 
 Change timezone to UTC on all sessions
-
 ```sql
 alter user postgres set
 timezone = 'UTC';
 ```
 
-- ISO 8601 - Formating DateTime Standard
-- FORMAT : YYYY-MM-DDTHH:MM:SS
-- TIME   : 2017-08-14T12:47:16+02:00
+* ISO 8601 - Formating DateTime Standard
+* FORMAT : YYYY-MM-DDTHH:MM:SS
+* TIME   : 2017-08-14T12:47:16+02:00
 
 ## Create Table
 
 ```sql
 create table timezones (
   ts TIMESTAMP without TIME zone,
-  tz  TIMESTAMP with TIME zone
+  tz TIMESTAMP with TIME zone
 )
 ```
 
@@ -192,8 +194,9 @@ insert into timezones values(
 ## Date Operators
 Get current date
 ```sql
-select now()::date;
-select current_date;
+select now()         -- 2023-07-02 19:15:38.759 +0200
+select now()::date;  -- 2023-07-02
+select current_date; -- 2023-07-02
 ```
 
 Format current date
@@ -223,7 +226,7 @@ https://www.postgresqltutorial.com/postgresql-string-functions/postgresql-to_cha
   
 ```sql
 select age(date '2000/12/10'); -- 22 years 5 mons 24 days
-select age(date '1988/12/10', date '1900-01-01'); 				 -- 88 years 11 mons 9 days
+select age(date '1988/12/10', date '1900-01-01'); -- 88 years 11 mons 9 days
 select to_char(age(date '1988/12/10', date '1900-01-01'), 'YY'); -- 88 => number of YEARS
 select to_char(age(date '1988/12/10', date '1900-01-01'), 'MM'); -- 11 => number of months
 select to_char(age(date '1988/12/10', date '1900-01-01'), 'DD'); -- 09 => number of days
@@ -232,12 +235,10 @@ select to_char(age(date '1988/12/10', date '1900-01-01'), 'DDD'); -- 32019 => nu
 
 
 #### EXTRACT
-
-Get Day, month etc from date
-  
+Get day, month from date 
 ```sql
-select extract (day from date '1988/12/10') as DAY_FROM_DATE;
-select extract (month from date '1988/12/10') as MONTH_FROM_DATE;
+select extract (day from date '1988/12/10') as DAY_FROM_DATE; -- 10
+select extract (month from date '1988/12/10') as MONTH_FROM_DATE; -- 12
 ```
 
 #### DATE_TRUNC
@@ -250,69 +251,99 @@ Can use with Years, Months etc.
 
 ```sql
 select *
-from employees e
-where hire_date <= now() - interval '38 years';
+from 
+    employees e
+where 
+    hire_date <= now() - interval '38 years';
 ```
 
 ```sql
 select *
-from employees e
-where hire_date <= now() - interval '38 years 1 months 3 days 3 hours 20 minutes';
+from 
+    employees e
+where 
+    hire_date <= now() - interval '38 years 1 months 3 days 3 hours 20 minutes';
 ```
 
 
 #### INTERVAL + EXTRACT
 6 years (20 months = 1 year + 8 months)
 ```sql
-select
-extract (year from interval '5 years 20 months');
+select extract (year from interval '5 years 20 months'); -- 6
 ```
 
 ### EXERCICES DATE FILTERING
 
 #### Get me all the employees above 60, use the appropriate date functions
-
 ```sql
-SELECT to_char(age(birth_date), 'YY') as years_old, * FROM employees
-where (to_char(age(birth_date), 'YY'))::int > 60;
+SELECT 
+    to_char(age(birth_date), 'YY') as years_old, 
+    * 
+FROM 
+    employees
+where 
+    (to_char(age(birth_date), 'YY'))::int > 60;
 ```
 
 ```sql
-select extract (year from age(birth_date)) as years_old, * from employees
-where extract (year from age(birth_date)) > 60;
+select 
+    extract (year from age(birth_date)) as years_old, 
+    * 
+from 
+    employees
+where 
+    extract (year from age(birth_date)) > 60;
 ```
 
-#### Who are the employees where hired in February?
-
+#### Who are the employees who where hired in February?
 ```sql
-select extract (month from hire_date) as month_of_hire, * from employees
-where extract (month from hire_date) = 2 and extract (year from hire_date) = extract(year from current_date);
+select 
+    extract (month from hire_date) as month_of_hire, 
+    * 
+from 
+    employees
+where 
+    extract (month from hire_date) = 2 
+    and extract (year from hire_date) = extract(year from current_date);
 ```
 
-#### Who many where hired in February (all years included)?
-
+#### How many where hired in February (all years included)?
 ```sql
-select count(emp_no) from employees
-where extract (month from hire_date) = 2;
+select 
+    count(emp_no) 
+from 
+    employees
+where 
+    extract (month from hire_date) = 2;
 ```
 
 #### Who is the oldest employee?
 ```sql
-select max(age(birth_date)) from employees;
+select 
+    max(age(birth_date)) 
+from 
+    employees;
 ```
 
 #### How many orders were made in January 2004
 ```sql
-select count(orderid) from orders where
-date_trunc('month', orderdate) = date '2004/01/01';
+select 
+    count(orderid) 
+from 
+    orders 
+where
+    date_trunc('month', orderdate) = date '2004/01/01';
 ```
-
 
 ## ORDER BY + Expression
 
 #### Order by length
 ```sql
-select first_name, last_name from employees
+select 
+    first_name, 
+    last_name 
+from 
+    employees
 order by length(first_name) desc;
 ```
 
@@ -320,16 +351,23 @@ order by length(first_name) desc;
 
 #### USING instead JOIN ON
 ```sql
-select e.emp_no, e.first_name, d.dept_name
-from employees e
+select 
+    e.emp_no, 
+    e.first_name, 
+    d.dept_name
+from 
+    employees e
 inner join dept_emp de using(emp_no)
 inner join departments d using(dept_no)
 ```
 
 ## GROUP BY
 ```sql
-select d.dept_name, COUNT(e.emp_no) as "# of employees"
-from employees e
+select 
+    d.dept_name, 
+    COUNT(e.emp_no) as "# of employees"
+from 
+    employees e
 inner join dept_emp de on de.emp_no = e.emp_no
 inner join departments d on de.dept_no = d.dept_no
 group by d.dept_no;
