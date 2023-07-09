@@ -56,12 +56,12 @@ where not age = 55 and not age = 20;
 ```
 
 #### NULL VALUES
-| Operation           | Result  |
-|:--------------------|:--------|
-| select 1 = 1 	   | true    |
-| select 1 != 1 	   | false   |
-| select null = null  | null    |
-| select null <> null | null    |
+| Operation            | Result |
+|:---------------------|:-------|
+| select 1 = 1         | true   |
+| select 1 != 1        | false  |
+| select null = null   | null   |
+| select null <> null  | null   |
 
 #### NULL + IS OPERATOR
 ```sql
@@ -391,22 +391,43 @@ order by COUNT(e.emp_no)
 ```
 
 ## UNION and UNION ALL
-#### union all doesn't remove duplicates
-name "prod_id" is necessary for the two combined tables
+- Combine results from 2 `SELECT` into one table
+- `UNION ALL` doesn't remove duplicates
+- The 2 SELECT need to have the same column names => `prod_id` is necessary in 1st `SELECT`
 
 ```sql
-select null as "prod_id", sum(ol.quantity)
-from orderlines as ol
+select 
+    null as "prod_id", -- column necessary for union
+    sum(ol.quantity)   -- sum of all quantities
+from orderlines as ol 
 
 union
 
-select prod_id as "prod_id", sum(ol.quantity)
+select 
+    prod_id as "prod_id", 
+    sum(ol.quantity)
 from orderlines as ol
 group by prod_id
 order by prod_id desc;
 ```
 
 ## GROUPING SETS
+Same query as the one with `UNION` but using `GROUPING SETS`
+```sql
+select 
+    prod_id as "prod_id",
+    sum(ol.quantity)
+from 
+    orderlines as ol
+group by
+    grouping sets (
+        (),
+        (prod_id)
+    )
+order by prod_id desc;
+```
+
+#### Get the total sum, the total sum by orderlineid and total sum by prod_id
 ```sql
 select 
     prod_id as "prod_id",
@@ -415,11 +436,11 @@ select
 from 
     orderlines as ol
 group by
-grouping sets (
-    (),
-    (prod_id),
-    (orderlineid)
-)
+    grouping sets (
+        (),
+        (prod_id),
+        (orderlineid)
+    )
 order by prod_id desc, orderlineid desc;
 ```
 
@@ -433,20 +454,21 @@ select
     sum(ol.quantity)
 from orderlines as ol
 group by
-rollup (
-extract (year from orderdate),
-extract (month from orderdate),
-extract (day from orderdate)
-)
+    rollup (
+        extract (year from orderdate),
+        extract (month from orderdate),
+        extract (day from orderdate)
+    )
 order by
-extract (year from orderdate),
-extract (month from orderdate),
-extract (day from orderdate)
+    extract (year from orderdate),
+    extract (month from orderdate),
+    extract (day from orderdate)
 ```
 
 ## OVER = WINDOW FUNCTION
-Get a max salary column for each row  
-Applies to each row, low performance
+Window functions create a new column based on functions performed on a subset/window of data  
+#### Show the max salary besides each indiviaual
+In this case max(salary) will execute for each individual row in the dataset, low performance
 ```sql
 select
     *,
@@ -454,12 +476,14 @@ select
 from salaries;
 ```
 
-### Partition = used like a group by
-Get department average salary
+### Partition (optional) used like a group by
+Divide rows into groups to apply the function against
+#### Show the department average salary besides (in the last column) for each individual
 
 ```sql
 select 
     *,
+    d.dept_name,
     avg(salary) over(
         partition by d.dept_name -- like a group by
     )
@@ -468,8 +492,10 @@ join dept_emp de using (emp_no)
 join departments d using (dept_no);
 ```
 
-#### ORDER BY
-Count applied makes the col count the rows cumulative of the partition before + current
+#### ORDER BY in window function
+- `ORDER BY` acts strangely in a window function, in the changes the frame of the window function
+- When using `COUNT` it counts everything before and the current frame
+- In the example below we get a cumulative `COUNT` of the partition before + current partition
 ```sql
 select 
     emp_no, 
@@ -479,7 +505,7 @@ select
 from salaries s;
 ```
 
-#### FRAMES
+#### ORDERY BY + PARTITION
 Count applied only to the partition (not cumulative)
 ```sql
 select
@@ -491,6 +517,17 @@ select
     )
 from salaries s;
 ```
+
+#### FRAMES
+- When using a FRAME CLAUSE in a window function we can create a sub-range/frame
+
+| Key                              | Meaning                                          |
+|:---------------------------------|:-------------------------------------------------|
+| ROWS OR RANGE                    | WHERE YOU WANT TO USE A RANGE OR ROWS AS A FRAME |
+| PRECEDING                        | ROWS BEFORE THE CURRENT ONE                      |
+| FOLLOWING                        | ROWS AFTER THE CURRENT ONE                       |
+| UNBOUNDED PRECEDING OR FOLLOWING | RETURNS ALL BEFORE AND AFTER                     |
+| CURRENT ROW                      | YOUR CURRENT ROW                                 |
 
 #### ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
 Works like an order by salary with no partition
